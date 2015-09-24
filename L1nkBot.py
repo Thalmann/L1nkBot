@@ -1,5 +1,4 @@
 import requests
-import threading
 import time
 import os
 
@@ -24,24 +23,28 @@ def get_update_id(message, old_update_id):
 def get_updates_message(payload = {"offset": 0}):
     return requests.get(update_url, payload).json()
 
-update_id = int(open(os.path.join(".", "update_id.txt"), "r").read())
-update_id = get_update_id(get_message(), update_id)
-print update_id
+def load_update_id():
+    return int(open(os.path.join(".", "update_id.txt"), "r").read())
 
+def save_update_id(update_id):
+    open(os.path.join(".", "update_id.txt"), "w").write(str(update_id))
+
+def send_text_message(chat_id, text):
+    payload = {"chat_id": chat_id, "text": text}
+    return requests.post(send_message_url, payload)
+
+old_update_id = load_update_id()
+update_id = get_update_id(get_message(), old_update_id)
 
 while True:   
     print "running"
     message = get_updates_message({"offset": update_id})
     if message[u"result"] != []:
-        print "new message: \n"
-        print message
-        chat_id = get_chat_id(message)        
-        print "CHAT ID: " + str(chat_id)
-        print "UPDATE ID: " + str(update_id)
-        payload = {"chat_id": chat_id, "text": "HIII"}
-        r = requests.post(send_message_url, payload)
-        print "Response: "
-        print r
+        chat_id = get_chat_id(message)
+        #### What shall happen :::::
+
+
+        ####        
         update_id += 1
-        open(os.path.join(".", "update_id.txt"), "w").write(str(update_id))
+        save_update_id(update_id)
     time.sleep(1)
