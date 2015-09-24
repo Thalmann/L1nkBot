@@ -9,22 +9,29 @@ update_url = url + "getUpdates"
 send_message_url = url + "sendMessage"
 
 def get_message():
-    return requests.get(update_url).json()
+    message = requests.get(update_url).json()
+    return message if message[u"result"] != [] else None
 
 def get_chat_id(message):
     return message[u"result"][0][u"message"][u"from"][u"id"]
 
-def get_update_id(message):
-    return message[u"result"][0][u"update_id"]
+def get_update_id(message, old_update_id):
+    if message != None:
+        return message[u"result"][0][u"update_id"]
+    else:
+        return old_update_id
 
 def get_updates_message(payload = {"offset": 0}):
     return requests.get(update_url, payload).json()
 
-update_id = get_update_id(get_message())
+update_id = int(open(os.path.join(".", "update_id.txt"), "r").read())
+update_id = get_update_id(get_message(), update_id)
 print update_id
+
+
 while True:   
     print "running"
-    message = get_updates_message({"offset": update_id})   
+    message = get_updates_message({"offset": update_id})
     if message[u"result"] != []:
         print "new message: \n"
         print message
@@ -36,4 +43,5 @@ while True:
         print "Response: "
         print r
         update_id += 1
-    time.sleep(2)
+        open(os.path.join(".", "update_id.txt"), "w").write(str(update_id))
+    time.sleep(1)
