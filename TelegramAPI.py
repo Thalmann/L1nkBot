@@ -10,6 +10,11 @@ def get_message():
     message = requests.get(update_url).json()
     return message if message[u"result"] != [] else None
 
+def get_text_message(message):
+    if message != None:
+        return message[u"result"][0][u"message"][u"text"]
+    raise ValueError("Invalid message")
+
 def get_chat_id(message):
     return message[u"result"][0][u"message"][u"from"][u"id"]
 
