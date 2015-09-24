@@ -9,7 +9,7 @@ while True:
     print "running"
     message = TelegramAPI.get_updates_message({"offset": update_id})
     if message[u"result"] != []:
-        print message
+        print TelegramAPI.get_text_message(message)
         chat_id = TelegramAPI.get_chat_id(message)
         #### What shall happen :::::
 
